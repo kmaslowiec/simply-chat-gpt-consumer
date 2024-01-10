@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -8,7 +10,6 @@ plugins {
 android {
     namespace = "com.example.simplychatgptapiconsumer"
     compileSdk = 34
-
     defaultConfig {
         applicationId = "com.example.simplychatgptapiconsumer"
         minSdk = 26
@@ -20,8 +21,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        buildConfigField("String", "CHATGPT_API_KEY", properties.getProperty("CHATGPT_API_KEY"))
+        buildConfigField("String", "CHATGPT_ORG_ID", properties.getProperty("CHATGPT_ORG_ID"))
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -37,6 +41,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -49,7 +54,6 @@ android {
 }
 
 dependencies {
-
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.8.2")
@@ -60,6 +64,9 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.50")
     ksp("com.google.dagger:dagger-compiler:2.50")
     ksp("com.google.dagger:hilt-android-compiler:2.50")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
     implementation("androidx.compose.material3:material3")
     testImplementation("junit:junit:4.13.2")
