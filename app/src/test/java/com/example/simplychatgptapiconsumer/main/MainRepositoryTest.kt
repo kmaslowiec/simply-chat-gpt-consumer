@@ -16,13 +16,13 @@ class MainRepositoryTest {
     private lateinit var mainRepository: MainRepository
 
     @BeforeEach
-    fun setUp() {
+    fun init() {
         chatGptApi = mockk()
         mainRepository = MainRepository(chatGptApi)
     }
 
     @Test
-    fun `getQuestions is successful when request returns response body`() {
+    fun `getQuestions is successful WHEN request returns response body`() =
         runTest {
             val chatResponse: ChatResponse = mockk()
             val response: Response<ChatResponse?> = mockk()
@@ -34,10 +34,9 @@ class MainRepositoryTest {
             assertTrue(tested.getOrNull() != null)
             assertTrue(tested.isSuccess)
         }
-    }
 
     @Test
-    fun `getQuestions fails when response returns null`() {
+    fun `getQuestions fails WHEN response returns null`() =
         runTest {
             val response: Response<ChatResponse?> = mockk()
             coEvery { chatGptApi.getChatCompletions(any()) } returns response
@@ -48,5 +47,4 @@ class MainRepositoryTest {
             assertTrue(tested.getOrNull() == null)
             assertTrue(tested.isFailure)
         }
-    }
 }
