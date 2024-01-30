@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Error
 import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Loading
 import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Success
@@ -29,5 +30,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
         text = "ChatGtp says: $name",
         modifier = modifier.verticalScroll(state = scrollState, enabled = true)
+            .testTag("MainTextField")
     )
 }
