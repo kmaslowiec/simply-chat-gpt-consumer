@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextInput
+import com.example.simplychatgptapiconsumer.common.component.TriviaSubject
 import org.junit.Rule
 import org.junit.Test
 
@@ -16,7 +17,14 @@ class MainScreenTest {
 
     @Test
     fun textChangeWHENTextIsWritten() {
-        composeRule.setContent { TriviaSubject(value = "Some text", errorState = false, onValueChange = {}) }
+        composeRule.setContent {
+            TriviaSubject(
+                value = "Some text",
+                errorState = false,
+                onValueChange = {},
+                onSend = {},
+            )
+        }
         composeRule.onNodeWithTag("Trivia subject").performTextInput("Some text")
 
         composeRule.onNodeWithTag("Trivia subject").assertExists()
@@ -25,7 +33,14 @@ class MainScreenTest {
 
     @Test
     fun showsErrorMessageWHENTextIsTooLong() {
-        composeRule.setContent { TriviaSubject(value = "", errorState = true, onValueChange = {}) }
+        composeRule.setContent {
+            TriviaSubject(
+                value = "",
+                errorState = true,
+                onValueChange = {},
+                onSend = {},
+            )
+        }
         composeRule.onNodeWithTag("Trivia subject").performTextInput("This is way too long text that cause the error")
 
         composeRule.onNodeWithText("Too long subject").assertExists()
@@ -33,7 +48,14 @@ class MainScreenTest {
 
     @Test
     fun doesNotShowsErrorMessageWHENTextIsShortEnough() {
-        composeRule.setContent { TriviaSubject(value = "", errorState = false, onValueChange = {}) }
+        composeRule.setContent {
+            TriviaSubject(
+                value = "",
+                errorState = false,
+                onValueChange = {},
+                onSend = {},
+            )
+        }
         composeRule.onNodeWithTag("Trivia subject").performTextInput("Some short text")
 
         composeRule.onNodeWithText("Too long subject").assertDoesNotExist()
