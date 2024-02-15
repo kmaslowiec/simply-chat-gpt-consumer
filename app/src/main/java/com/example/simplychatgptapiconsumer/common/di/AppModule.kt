@@ -2,10 +2,10 @@ package com.example.simplychatgptapiconsumer.common.di
 
 import com.example.simplychatgptapiconsumer.BuildConfig
 import com.example.simplychatgptapiconsumer.common.api.ChatGptApi
-import com.example.simplychatgptapiconsumer.common.constants.BASE_URL
-import com.example.simplychatgptapiconsumer.common.constants.CONNECT_TIMEOUT
-import com.example.simplychatgptapiconsumer.common.constants.READ_TIMEOUT
-import com.example.simplychatgptapiconsumer.common.constants.WRITE_TIMEOUT
+import com.example.simplychatgptapiconsumer.common.constant.BASE_URL
+import com.example.simplychatgptapiconsumer.common.constant.CONNECT_TIMEOUT
+import com.example.simplychatgptapiconsumer.common.constant.READ_TIMEOUT
+import com.example.simplychatgptapiconsumer.common.constant.WRITE_TIMEOUT
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
