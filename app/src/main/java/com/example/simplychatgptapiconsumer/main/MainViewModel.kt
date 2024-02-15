@@ -18,13 +18,10 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
     private val _questionsState = MutableStateFlow<ChatAnswerState>(Loading)
     val questionsState = _questionsState.asStateFlow()
 
-    init {
-        getResponse()
-    }
-
-    private fun getResponse() {
+    fun getResponse(query: String) {
         viewModelScope.launch {
-            mainRepository.getQuestions("Berlin")
+            _questionsState.value = Loading
+            mainRepository.getQuestions(query)
                 .onSuccess {
                     _questionsState.value = Success(it.choices.first().message)
                 }
