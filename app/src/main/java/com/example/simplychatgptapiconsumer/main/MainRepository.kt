@@ -1,7 +1,7 @@
 package com.example.simplychatgptapiconsumer.main
 
 import com.example.simplychatgptapiconsumer.common.api.ChatGptApi
-import com.example.simplychatgptapiconsumer.common.constants.SYSTEM_INSTRUCTION
+import com.example.simplychatgptapiconsumer.common.constant.SYSTEM_INSTRUCTION
 import com.example.simplychatgptapiconsumer.common.model.ChatRequest
 import com.example.simplychatgptapiconsumer.common.model.ChatResponse
 import com.example.simplychatgptapiconsumer.common.model.Message

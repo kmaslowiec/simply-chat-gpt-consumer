@@ -1,4 +1,4 @@
-package com.example.simplychatgptapiconsumer.common.constants
+package com.example.simplychatgptapiconsumer.common.constant
 
 const val BASE_URL = "https://api.openai.com/"
 const val CONNECT_TIMEOUT = 50L

@@ -26,7 +26,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppContainer(content: @Composable () -> Unit) {
     SimplyChatGptApiConsumerTheme(dynamicColor = false) {
-        Surface(modifier = Modifier.fillMaxSize().testTag("MainSurface"), color = MaterialTheme.colorScheme.background) {
+        Surface(
+            modifier = Modifier.fillMaxSize()
+                .testTag("MainSurface"),
+            color = MaterialTheme.colorScheme.background,
+        ) {
             content()
         }
     }

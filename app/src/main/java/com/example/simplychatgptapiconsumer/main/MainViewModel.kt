@@ -24,7 +24,7 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
 
     private fun getResponse() {
         viewModelScope.launch {
-            mainRepository.getQuestions("Szczecin")
+            mainRepository.getQuestions("Berlin")
                 .onSuccess {
                     _questionsState.value = Success(it.choices.first().message)
                 }
