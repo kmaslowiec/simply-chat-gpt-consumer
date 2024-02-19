@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState
 import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Error
+import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Idle
 import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Loading
 import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(private val mainRepository: MainRepository) : ViewModel() {
 
-    private val _questionsState = MutableStateFlow<ChatAnswerState>(Loading)
+    private val _questionsState = MutableStateFlow<ChatAnswerState>(Idle)
     val questionsState = _questionsState.asStateFlow()
 
     fun getResponse(query: String) {
