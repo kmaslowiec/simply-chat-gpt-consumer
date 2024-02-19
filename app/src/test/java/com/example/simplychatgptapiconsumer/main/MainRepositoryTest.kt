@@ -10,12 +10,10 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import retrofit2.Response
 
 class MainRepositoryTest {
 
     private val chatGptApi: ChatGptApi by lazy { mockk() }
-    private val response: Response<ChatResponse?> by lazy { mockk() }
     private lateinit var mainRepository: MainRepository
 
     @BeforeEach
@@ -24,11 +22,10 @@ class MainRepositoryTest {
     }
 
     @Test
-    fun `getQuestions is successful WHEN request returns response body`() {
+    fun `getQuestions is successful WHEN request returns chatResponse`() {
         runTest {
             val chatResponse: ChatResponse = mockk()
-            coEvery { chatGptApi.getChatCompletions(any()) } returns response
-            coEvery { response.body() } returns chatResponse
+            coEvery { chatGptApi.getChatCompletions(any()) } returns chatResponse
 
             val result = mainRepository.getQuestions("request")
 
@@ -38,11 +35,9 @@ class MainRepositoryTest {
     }
 
     @Test
-    fun `getQuestions fails WHEN response returns null`() {
+    fun `getQuestions fails WHEN response throws exception`() {
         runTest {
-            val response: Response<ChatResponse?> = mockk()
-            coEvery { chatGptApi.getChatCompletions(any()) } returns response
-            coEvery { response.body() } returns null
+            coEvery { chatGptApi.getChatCompletions(any()) } throws Exception("")
 
             val result = mainRepository.getQuestions("request")
 
