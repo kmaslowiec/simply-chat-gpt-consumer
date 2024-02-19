@@ -2,7 +2,6 @@ package com.example.simplychatgptapiconsumer.common.api
 
 import com.example.simplychatgptapiconsumer.common.model.ChatRequest
 import com.example.simplychatgptapiconsumer.common.model.ChatResponse
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Headers
 import retrofit2.http.POST
@@ -13,5 +12,5 @@ interface ChatGptApi {
 
     @Headers("Content-Type: application/json")
     @POST("v1/chat/completions")
-    suspend fun getChatCompletions(@Body chatRequest: ChatRequest): Response<ChatResponse?>
+    suspend fun getChatCompletions(@Body chatRequest: ChatRequest): ChatResponse
 }
