@@ -1,21 +1,21 @@
 package com.example.simplychatgptapiconsumer.main
 
 import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Error
+import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Idle
 import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Loading
 import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Success
 import com.example.simplychatgptapiconsumer.common.model.ChatResponse
 import com.example.simplychatgptapiconsumer.common.model.Choice
 import com.example.simplychatgptapiconsumer.common.model.MessageResponse
 import com.example.simplychatgptapiconsumer.common.model.Usage
+import io.mockk.awaits
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainViewModelTest {
 
-    private val testDispatcher = StandardTestDispatcher()
+    private val testDispatcher = UnconfinedTestDispatcher()
     private val mainRepository: MainRepository by lazy { mockk() }
     private val choice by lazy { mockk<Choice>() }
     private val message by lazy { MessageResponse(role = "", content = "") }
@@ -66,7 +66,6 @@ class MainViewModelTest {
 
             mainViewModel.getResponse("Szczecin")
 
-            advanceUntilIdle()
             assertTrue(mainViewModel.questionsState.value is Success)
         }
     }
@@ -78,43 +77,26 @@ class MainViewModelTest {
 
             mainViewModel.getResponse("Szczecin")
 
-            advanceUntilIdle()
             assertTrue(mainViewModel.questionsState.value is Error)
         }
     }
 
     @Test
-    fun `questionsState is Loading WHEN questions were not fetched yet`() {
+    fun `questionsState is Idle WHEN questions were not fetched yet`() {
         runTest {
-            assertTrue(mainViewModel.questionsState.value is Loading)
+            assertTrue(mainViewModel.questionsState.value is Idle)
         }
     }
 
     @Test
-    fun `questionsState is Loading WHEN the success is not called yet`() {
+    fun `questionsState is Loading WHEN before the fetch result`() {
         runTest {
             coEvery { choice.message } returns message
-            coEvery { mainRepository.getQuestions("Szczecin") } returns Result.success(chatResponse)
+            coEvery { mainRepository.getQuestions("Szczecin") } just awaits
 
             mainViewModel.getResponse("Szczecin")
-            val state = mainViewModel.questionsState.take(2).toList()
 
-            advanceUntilIdle()
-            assertEquals(Loading, state[0])
-        }
-    }
-
-    @Test
-    fun `questionsState is Loading WHEN the failure is not called yet`() {
-        runTest {
-            coEvery { choice.message } returns message
-            coEvery { mainRepository.getQuestions("Szczecin") } returns Result.failure(Exception())
-
-            mainViewModel.getResponse("Szczecin")
-            val state = mainViewModel.questionsState.take(1).toList()
-
-            advanceUntilIdle()
-            assertEquals(Loading, state.first())
+            assertEquals(Loading, mainViewModel.questionsState.value)
         }
     }
 }

@@ -2,12 +2,15 @@ package com.example.simplychatgptapiconsumer.main
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -15,12 +18,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import com.example.simplychatgptapiconsumer.common.component.ResultText
 import com.example.simplychatgptapiconsumer.common.component.TriviaSubject
 import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Error
+import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Idle
 import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Loading
 import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Success
 
@@ -46,7 +51,16 @@ fun MainScreen(viewModel: MainViewModel) {
             },
         )
         when (val state = viewModel.questionsState.collectAsState().value) {
-            is Loading -> {}//TODO add loader
+            is Idle -> {}
+
+            is Loading -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) { CircularLoader() }
+            }
+
             is Success -> {
                 Column(
                     Modifier.padding(
@@ -69,4 +83,13 @@ fun MainScreen(viewModel: MainViewModel) {
             is Error -> {} //TODO handle error
         }
     }
+}
+
+@Composable
+fun CircularLoader() {
+    CircularProgressIndicator(
+        modifier = Modifier.width(64.dp),
+        color = MaterialTheme.colorScheme.secondary,
+        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+    )
 }
