@@ -1,4 +1,4 @@
-package com.example.simplychatgptapiconsumer.main
+package com.example.simplychatgptapiconsumer
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.simplychatgptapiconsumer.main.view.MainScreen
 import com.example.simplychatgptapiconsumer.ui.theme.SimplyChatGptApiConsumerTheme
 import dagger.hilt.android.AndroidEntryPoint
 

@@ -1,7 +1,8 @@
 package com.example.simplychatgptapiconsumer.main
 
 import com.example.simplychatgptapiconsumer.common.api.ChatGptApi
-import com.example.simplychatgptapiconsumer.common.model.ChatResponse
+import com.example.simplychatgptapiconsumer.common.apimodel.ChatResponse
+import com.example.simplychatgptapiconsumer.main.repository.MainRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest

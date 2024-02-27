@@ -1,7 +1,7 @@
 package com.example.simplychatgptapiconsumer.common.api
 
-import com.example.simplychatgptapiconsumer.common.model.ChatRequest
-import com.example.simplychatgptapiconsumer.common.model.ChatResponse
+import com.example.simplychatgptapiconsumer.common.apimodel.ChatRequest
+import com.example.simplychatgptapiconsumer.common.apimodel.ChatResponse
 import retrofit2.http.Body
 import retrofit2.http.Headers
 import retrofit2.http.POST

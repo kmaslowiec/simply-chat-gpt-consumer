@@ -3,4 +3,5 @@
     <string name="mainScreenTriviaSubjectLabelText">Trivia Subject</string>
     <string name="mainScreenTriviaSubjectTestTag">Trivia subject</string>
     <string name="mainScreenTriviaSubjectSupportingText">Too long subject</string>
+    <string name="mainScreenErrorSomethingWentWrong">Something went wrong</string>
 </resources>

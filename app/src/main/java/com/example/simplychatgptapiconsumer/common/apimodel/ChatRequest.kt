@@ -1,4 +1,4 @@
-package com.example.simplychatgptapiconsumer.common.model
+package com.example.simplychatgptapiconsumer.common.apimodel
 
 import com.example.simplychatgptapiconsumer.common.constant.CHAT_GPT_MODEL_ID
 import com.example.simplychatgptapiconsumer.common.constant.CHAT_GPT_TEMPERATURE

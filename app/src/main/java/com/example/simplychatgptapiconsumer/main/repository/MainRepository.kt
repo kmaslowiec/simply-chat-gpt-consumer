@@ -1,9 +1,9 @@
-package com.example.simplychatgptapiconsumer.main
+package com.example.simplychatgptapiconsumer.main.repository
 
 import com.example.simplychatgptapiconsumer.common.api.ChatGptApi
+import com.example.simplychatgptapiconsumer.common.apimodel.ChatRequest
+import com.example.simplychatgptapiconsumer.common.apimodel.Message
 import com.example.simplychatgptapiconsumer.common.constant.SYSTEM_INSTRUCTION
-import com.example.simplychatgptapiconsumer.common.model.ChatRequest
-import com.example.simplychatgptapiconsumer.common.model.Message
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

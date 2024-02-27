@@ -1,13 +1,14 @@
 package com.example.simplychatgptapiconsumer.main
 
-import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Error
-import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Idle
-import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Loading
-import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Success
-import com.example.simplychatgptapiconsumer.common.model.ChatResponse
-import com.example.simplychatgptapiconsumer.common.model.Choice
-import com.example.simplychatgptapiconsumer.common.model.MessageResponse
-import com.example.simplychatgptapiconsumer.common.model.Usage
+import com.example.simplychatgptapiconsumer.common.apimodel.ChatResponse
+import com.example.simplychatgptapiconsumer.common.apimodel.Choice
+import com.example.simplychatgptapiconsumer.common.apimodel.MessageResponse
+import com.example.simplychatgptapiconsumer.common.apimodel.Usage
+import com.example.simplychatgptapiconsumer.main.intent.MainViewIntent
+import com.example.simplychatgptapiconsumer.main.intent.MainViewSideEffect
+import com.example.simplychatgptapiconsumer.main.mvimodel.ResponseType
+import com.example.simplychatgptapiconsumer.main.repository.MainRepository
+import com.example.simplychatgptapiconsumer.main.view.MainViewModel
 import io.mockk.awaits
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -15,13 +16,14 @@ import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -59,44 +61,79 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `questionsState is Success WHEN questions are fetched correctly`() {
+    fun `update trivia subject WHEN new subject is provided`() {
         runTest {
             coEvery { choice.message } returns message
             coEvery { mainRepository.getQuestions("Szczecin") } returns Result.success(chatResponse)
+            mainViewModel.updateTriviaSubject("Szczecin")
 
-            mainViewModel.getResponse("Szczecin")
-
-            assertTrue(mainViewModel.questionsState.value is Success)
+            assertEquals(mainViewModel.state.value.triviaSubject, "Szczecin")
         }
     }
 
     @Test
-    fun `questionsState is Error WHEN questions are not fetched correctly`() {
-        runTest {
-            coEvery { mainRepository.getQuestions("Szczecin") } returns Result.failure(Exception())
-
-            mainViewModel.getResponse("Szczecin")
-
-            assertTrue(mainViewModel.questionsState.value is Error)
-        }
-    }
-
-    @Test
-    fun `questionsState is Idle WHEN questions were not fetched yet`() {
-        runTest {
-            assertTrue(mainViewModel.questionsState.value is Idle)
-        }
-    }
-
-    @Test
-    fun `questionsState is Loading WHEN before the fetch result`() {
+    fun `MainViewState type is Success WHEN data is fetched correctly`() {
         runTest {
             coEvery { choice.message } returns message
-            coEvery { mainRepository.getQuestions("Szczecin") } just awaits
+            coEvery { mainRepository.getQuestions("") } returns Result.success(chatResponse)
+            val intent = MainViewIntent.AskChat
 
-            mainViewModel.getResponse("Szczecin")
+            mainViewModel.emitIntent(intent)
 
-            assertEquals(Loading, mainViewModel.questionsState.value)
+            assertEquals(ResponseType.SUCCESS, mainViewModel.state.value.type)
+        }
+    }
+
+    @Test
+    fun `MainViewState type is Error WHEN data is not fetched correctly`() {
+        runTest {
+            coEvery { mainRepository.getQuestions("") } returns Result.failure(Exception())
+            val intent = MainViewIntent.AskChat
+
+            mainViewModel.emitIntent(intent)
+
+            assertEquals(ResponseType.FAILURE, mainViewModel.state.value.type)
+        }
+    }
+
+
+    @Test
+    fun `MainViewState type is Idle WHEN data was not fetched yet`() {
+        runTest {
+            assertEquals(ResponseType.IDLE, mainViewModel.state.value.type)
+        }
+    }
+
+
+    @Test
+    fun `MainViewState type is Loading WHEN data is being fetched`() {
+        runTest {
+            coEvery { choice.message } returns message
+            coEvery { mainRepository.getQuestions("") } just awaits
+            val intent = MainViewIntent.AskChat
+
+            mainViewModel.emitIntent(intent)
+
+            assertEquals(ResponseType.LOADING, mainViewModel.state.value.type)
+        }
+    }
+
+
+    @Test
+    fun `sideEffect is ShowSnackBar WHEN ShowSnackBar is emitted`() {
+        runTest {
+            coEvery { choice.message } returns message
+            coEvery { mainRepository.getQuestions("") } returns Result.success(chatResponse)
+            val expectedSideEffect = MainViewSideEffect.ShowSnackBar("")
+            val sideEffects = mutableListOf<MainViewSideEffect>(MainViewSideEffect.ShowSnackBar(""))
+            val job = launch {
+                mainViewModel.sideEffects.toList(sideEffects)
+            }
+
+            mainViewModel.emitSideEffect(expectedSideEffect)
+
+            assertEquals(expectedSideEffect, sideEffects.first())
+            job.cancel()
         }
     }
 }
