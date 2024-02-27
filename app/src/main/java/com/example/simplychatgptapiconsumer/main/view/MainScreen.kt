@@ -1,9 +1,10 @@
-package com.example.simplychatgptapiconsumer.main
+package com.example.simplychatgptapiconsumer.main.view
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -12,48 +13,68 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.simplychatgptapiconsumer.R
 import com.example.simplychatgptapiconsumer.common.component.ResultText
 import com.example.simplychatgptapiconsumer.common.component.TriviaSubject
-import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Error
-import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Idle
-import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Loading
-import com.example.simplychatgptapiconsumer.common.model.ChatAnswerState.Success
+import com.example.simplychatgptapiconsumer.main.intent.MainViewIntent
+import com.example.simplychatgptapiconsumer.main.intent.MainViewSideEffect.ShowSnackBar
+import com.example.simplychatgptapiconsumer.main.mvimodel.ResponseType.FAILURE
+import com.example.simplychatgptapiconsumer.main.mvimodel.ResponseType.IDLE
+import com.example.simplychatgptapiconsumer.main.mvimodel.ResponseType.LOADING
+import com.example.simplychatgptapiconsumer.main.mvimodel.ResponseType.SUCCESS
+import kotlinx.coroutines.flow.collectLatest
 
 
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
-    var textState by rememberSaveable { mutableStateOf("") }
-    var errorState by rememberSaveable { mutableStateOf(false) }
+    var errorState by rememberSaveable { mutableStateOf(false) } // TODO move it to the model?
     val scrollState = rememberScrollState(0)
+    val state = viewModel.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val triviaSubject = viewModel.state.value.triviaSubject
 
     val controller = LocalSoftwareKeyboardController.current
     Column(modifier = Modifier.fillMaxSize()) {
         TriviaSubject(
-            textState, errorState = errorState,
+            value = triviaSubject,
+            errorState = errorState,
             onValueChange = {
-                textState = it
-                errorState = textState.length > 30
+                viewModel.updateTriviaSubject(it)
+                errorState = triviaSubject.length > 30
             },
             onSend = {
-                viewModel.getResponse(textState)
-                textState = ""
+                viewModel.emitIntent(MainViewIntent.AskChat)
                 controller?.hide()
             },
         )
-        when (val state = viewModel.questionsState.collectAsState().value) {
-            is Idle -> {}
 
-            is Loading -> {
+        LaunchedEffect(true) {
+            viewModel.sideEffects.collectLatest {
+                when (it) {
+                    is ShowSnackBar -> snackbarHostState.showSnackbar(it.text)
+                }
+            }
+        }
+
+        when (state.value.type) {
+            IDLE -> {} //TODO handle the idle screen
+
+            LOADING -> {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -61,7 +82,7 @@ fun MainScreen(viewModel: MainViewModel) {
                 ) { CircularLoader() }
             }
 
-            is Success -> {
+            SUCCESS -> {
                 Column(
                     Modifier.padding(
                         bottom = 16.dp,
@@ -73,14 +94,24 @@ fun MainScreen(viewModel: MainViewModel) {
                     )
                 ) {
                     ResultText(
-                        content = state.questions.content,
+                        content = state.value.chatResponse,
                         modifier = Modifier.padding(4.dp)
                             .verticalScroll(scrollState),
                     )
                 }
             }
 
-            is Error -> {} //TODO handle error
+            FAILURE -> {
+                viewModel.emitSideEffect(ShowSnackBar(text = stringResource(R.string.mainScreenErrorSomethingWentWrong)))
+                Column(
+                    Modifier.fillMaxHeight(),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    SnackbarHost(
+                        hostState = snackbarHostState
+                    )
+                }
+            }
         }
     }
 }
