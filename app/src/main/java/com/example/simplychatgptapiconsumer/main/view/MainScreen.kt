@@ -17,7 +17,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,7 +43,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun MainScreen(viewModel: MainViewModel) {
     var errorState by rememberSaveable { mutableStateOf(false) } // TODO move it to the model?
     val scrollState = rememberScrollState(0)
-    val state = viewModel.state.collectAsState()
+    val state = viewModel.state
     val snackbarHostState = remember { SnackbarHostState() }
     val triviaSubject = viewModel.state.value.triviaSubject
 

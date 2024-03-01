@@ -1,0 +1,3 @@
+package com.example.simplychatgptapiconsumer.common.mvicomponents
+
+interface MviIntent
