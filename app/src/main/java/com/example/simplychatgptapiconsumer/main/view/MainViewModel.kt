@@ -24,6 +24,10 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun updateIsTriviaSubjectTooLong(isTriviaSubjectTooLong: Boolean) {
+        _state.update { copy(isTriviaSubjectTooLong = isTriviaSubjectTooLong) }
+    }
+
     private fun getResponse(query: String) {
         viewModelScope.launch {
             _state.value = MainViewState(type = LOADING)

@@ -7,27 +7,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.simplychatgptapiconsumer.R
+import com.example.simplychatgptapiconsumer.common.component.CircularLoader
 import com.example.simplychatgptapiconsumer.common.component.ResultText
 import com.example.simplychatgptapiconsumer.common.component.TriviaSubject
 import com.example.simplychatgptapiconsumer.main.intent.MainViewIntent
@@ -41,20 +36,19 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
-    var errorState by rememberSaveable { mutableStateOf(false) } // TODO move it to the model?
-    val scrollState = rememberScrollState(0)
     val state = viewModel.state
-    val snackbarHostState = remember { SnackbarHostState() }
+    val scrollState = rememberScrollState(0)
+    val snackBarHostState = remember { SnackbarHostState() }
     val triviaSubject = viewModel.state.value.triviaSubject
 
     val controller = LocalSoftwareKeyboardController.current
     Column(modifier = Modifier.fillMaxSize()) {
         TriviaSubject(
             value = triviaSubject,
-            errorState = errorState,
+            errorState = state.value.isTriviaSubjectTooLong,
             onValueChange = {
                 viewModel.updateTriviaSubject(it)
-                errorState = triviaSubject.length > 30
+                viewModel.updateIsTriviaSubjectTooLong(triviaSubject.length > 30)
             },
             onSend = {
                 viewModel.emitIntent(MainViewIntent.AskChat)
@@ -65,7 +59,7 @@ fun MainScreen(viewModel: MainViewModel) {
         LaunchedEffect(true) {
             viewModel.sideEffects.collectLatest {
                 when (it) {
-                    is ShowSnackBar -> snackbarHostState.showSnackbar(it.text)
+                    is ShowSnackBar -> snackBarHostState.showSnackbar(it.snackBarMessage)
                 }
             }
         }
@@ -101,25 +95,16 @@ fun MainScreen(viewModel: MainViewModel) {
             }
 
             FAILURE -> {
-                viewModel.emitSideEffect(ShowSnackBar(text = stringResource(R.string.mainScreenErrorSomethingWentWrong)))
+                viewModel.emitSideEffect(ShowSnackBar(snackBarMessage = stringResource(R.string.mainScreenErrorSomethingWentWrong)))
                 Column(
                     Modifier.fillMaxHeight(),
                     verticalArrangement = Arrangement.Bottom
                 ) {
                     SnackbarHost(
-                        hostState = snackbarHostState
+                        hostState = snackBarHostState
                     )
                 }
             }
         }
     }
-}
-
-@Composable
-fun CircularLoader() {
-    CircularProgressIndicator(
-        modifier = Modifier.width(64.dp),
-        color = MaterialTheme.colorScheme.secondary,
-        trackColor = MaterialTheme.colorScheme.surfaceVariant,
-    )
 }
